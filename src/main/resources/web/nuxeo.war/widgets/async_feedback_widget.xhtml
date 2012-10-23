@@ -1,0 +1,105 @@
+<div xmlns:c="http://java.sun.com/jstl/core"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:nxu="http://nuxeo.org/nxweb/util"
+  xmlns:nxd="http://nuxeo.org/nxweb/document"
+  xmlns:nxl="http://nuxeo.org/nxforms/layout"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:nxp="http://nuxeo.org/nxweb/pdf">
+
+  <script src="//cdn.sockjs.org/sockjs-0.2.1.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vertx/1.2.3/vertxbus.min.js"></script>
+
+<div id="send">
+
+  <form onsubmit="return false;">
+    Message:<input type="text" id="sendMessage" value="Hello, World!"/>
+    <input type="button" id="sendButton" value="Send message"/>
+  </form>
+</div>
+
+<br />
+
+<div id="receive" >
+
+  Received messages:<br />
+
+  <div id="received" >
+  </div>
+
+</div>
+
+<div id="status">
+  Connection Status:
+  <div id="status_info">Not connected</div>
+  
+  <br />
+  Subscriptions:<br />
+
+  <div id="subscribed">
+  </div>
+</div>
+
+
+<script>
+
+  var eb = null;
+  var docId = '#{currentDocument.id}';
+
+  function publish(address, message) {
+    if (eb) {
+      var json = {text: message};
+      eb.publish(address, json);
+    }
+  }
+
+  function subscribe(address) {
+    if (eb) {
+      eb.registerHandler(address, function(msg, replyTo) {
+        jQuery('#received').append(msg.text + '&lt;br&gt;');
+      });
+      jQuery('#subscribed').append(jQuery('&lt;code&gt;').text('Address:' + address));
+      jQuery('#subscribed').append(jQuery('&lt;/code&gt;&lt;br&gt;'));
+      publish(docId, "#{currentUser.name} connected");
+    }
+  }
+
+  function closeConn() {
+    if (eb) {
+      eb.close();
+    }
+  }
+
+  function openConn() {
+    if (!eb) {
+      eb = new vertx.EventBus("http://localhost:8081/eventbus");
+
+      eb.onopen = function() {
+        jQuery("#status_info").text("Connected");
+        subscribe(docId);
+      };
+
+      eb.onclose = function() {
+        jQuery("#status_info").text("Not connected");
+        eb = null;
+      };
+      
+    }
+  }
+
+  jQuery(document).ready(function() {
+  
+    jQuery(window).unload(function() {
+      closeConn();
+    });
+
+    jQuery('#sendButton').click(function() {
+      publish(docId, jQuery('#sendMessage').val());
+    });
+  
+    openConn();
+
+  });
+
+</script>
+
+</div>

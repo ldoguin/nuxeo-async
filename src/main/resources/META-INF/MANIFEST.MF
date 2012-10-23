@@ -1,0 +1,10 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Name: nuxeo-async
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Nuxeo
+Bundle-Version: 5.7-I20120918_1109
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: nuxeo-async
+Nuxeo-Component: OSGI-INF/async-layout-contrib.xml
