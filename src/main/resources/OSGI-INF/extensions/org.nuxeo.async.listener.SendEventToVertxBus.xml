@@ -1,0 +1,14 @@
+<component name="org.nuxeo.async.listener.listener.contrib.SendEventToVertxBus">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+    point="listener">
+
+    <listener name="sendeventtovertxbus" async="false" postCommit="false"
+      class="org.nuxeo.async.listener.SendEventToVertxBus" order="100">
+      <event>documentModified</event>
+      <event>documentLocked</event>
+      <event>documentUnlocked</event>
+    </listener>
+  </extension>
+
+</component>

@@ -10,7 +10,6 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/vertx/1.2.3/vertxbus.min.js"></script>
 
 <div id="send">
-
   <form onsubmit="return false;">
     Message:<input type="text" id="sendMessage" value="Hello, World!"/>
     <input type="button" id="sendButton" value="Send message"/>
@@ -20,23 +19,14 @@
 <br />
 
 <div id="receive" >
-
   Received messages:<br />
-
   <div id="received" >
   </div>
-
 </div>
 
 <div id="status">
-  Connection Status:
   <div id="status_info">Not connected</div>
-  
-  <br />
-  Subscriptions:<br />
-
-  <div id="subscribed">
-  </div>
+  <span id="subscribed"></span> 
 </div>
 
 
@@ -44,10 +34,12 @@
 
   var eb = null;
   var docId = '#{currentDocument.id}';
+  var userId = '#{currentUser.name}';
+  var userToken = 'token';
 
   function publish(address, message) {
     if (eb) {
-      var json = {text: message};
+      var json = {text: message, user:userId, token:userToken};
       eb.publish(address, json);
     }
   }
@@ -57,7 +49,7 @@
       eb.registerHandler(address, function(msg, replyTo) {
         jQuery('#received').append(msg.text + '&lt;br&gt;');
       });
-      jQuery('#subscribed').append(jQuery('&lt;code&gt;').text('Address:' + address));
+      jQuery('#subscribed').append(jQuery('&lt;code&gt;').text('to ' + address));
       jQuery('#subscribed').append(jQuery('&lt;/code&gt;&lt;br&gt;'));
       publish(docId, "#{currentUser.name} connected");
     }
