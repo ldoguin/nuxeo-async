@@ -52,13 +52,11 @@ Connected User:
   }
 
   function addUser(userName) {
-    if (jQuery.inArray(userName, users) == -1) {
       var $div = jQuery("&lt;div&gt;").attr("class","user");
       var $image = jQuery("&lt;span&gt;").appendTo($div);
       var $text = jQuery("&lt;span&gt;").text(userName).appendTo($div);
       $div.appendTo("#connectedUsers");
       users.pushUnique(userName);
-    }
   }
 
   function publish(address, message) {
@@ -72,10 +70,14 @@ Connected User:
     if (eb) {
       eb.registerHandler(address, function(msg, replyTo) {
         if (msg.text) {
-          var obj = jQuery.parseJSON(msg.text);
-          if (obj) {
-            addUser(obj.username);
-            publish(chanAddress, '{"username":"' + username() + '"}');
+          if (msg.text.indexOf("{") == 0) {
+            var obj = jQuery.parseJSON(msg.text);
+            if (obj.user) {
+              if (jQuery.inArray(obj.user.username, users) == -1) {
+                addUser(obj.user.username);
+                publish(chanAddress, '{"user":{"username":"' + username() + '"}}');
+              }
+            }
           } else {
             jQuery('#received').prepend(msg.text + '&lt;br&gt;');
           }
@@ -83,13 +85,13 @@ Connected User:
           jQuery('#received').prepend(msg.event + '&lt;br&gt;');        
         }
       });
-      publish(chanAddress, '{"username":"' + username() + '"}');
+      addUser(username());
+      publish(chanAddress, '{"user":{"username":"' + username() + '"}}');
     }
   }
 
   function closeConn() {
     if (eb) {
-      publish(chanAddress, userId + " left the page");
       eb.close();
     }
   }
@@ -112,7 +114,7 @@ Connected User:
 
   jQuery(document).ready(function() {
     jQuery(window).unload(function() {
-      closeConn();
+       publish(chanAddress, userId + " left the page");
     });
 
     jQuery('#sendButton').click(function() {
