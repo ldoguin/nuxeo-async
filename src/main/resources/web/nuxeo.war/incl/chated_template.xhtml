@@ -1,17 +1,9 @@
-<div xmlns:c="http://java.sun.com/jstl/core"
-  xmlns:f="http://java.sun.com/jsf/core"
-  xmlns:nxu="http://nuxeo.org/nxweb/util"
-  xmlns:nxd="http://nuxeo.org/nxweb/document"
-  xmlns:nxl="http://nuxeo.org/nxforms/layout"
-  xmlns:h="http://java.sun.com/jsf/html"
-  xmlns:nxp="http://nuxeo.org/nxweb/pdf">
+<div style="float:right">
 
-  <script src="//cdn.sockjs.org/sockjs-0.2.1.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/vertx/1.2.3/vertxbus.min.js"></script>
-
+<div>
 <div id="send">
   <form onsubmit="return false;">
-    Message:<input type="text" id="sendMessage" value="Hello, World!"/>
+    <input type="text" id="sendMessage" value="Hello, World!"/>
     <input type="button" id="sendButton" value="Send message"/>
   </form>
 </div>
@@ -19,16 +11,14 @@
 <br />
 
 <div id="receive" >
-  Received messages:<br />
   <div id="received" >
   </div>
 </div>
 
-<div id="status">
-  <div id="status_info">Not connected</div>
-  <span id="subscribed"></span> 
 </div>
 
+<script src="//cdn.sockjs.org/sockjs-0.2.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/vertx/1.2.3/vertxbus.min.js"></script>
 
 <script>
 
@@ -49,8 +39,6 @@
       eb.registerHandler(address, function(msg, replyTo) {
         jQuery('#received').prepend(msg.text + '&lt;br&gt;');
       });
-      jQuery('#subscribed').append(jQuery('&lt;code&gt;').text('to ' + address));
-      jQuery('#subscribed').append(jQuery('&lt;/code&gt;&lt;br&gt;'));
       publish(chanAddress, "#{currentUser.name} connected");
     }
   }

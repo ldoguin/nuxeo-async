@@ -4,9 +4,9 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Version: 5.7-I20120918_1109
 Bundle-Name: nuxeo-async
-Nuxeo-Component: OSGI-INF/async-layout-contrib.xml,OSGI-INF/extensions
- /org.nuxeo.async.listener.SendEventToVertxBus.xml
 Bundle-ManifestVersion: 2
+Nuxeo-Component: OSGI-INF/extensions/org.nuxeo.async.listener.SendEven
+ tToVertxBus.xml
 Bundle-SymbolicName: nuxeo-async
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 
