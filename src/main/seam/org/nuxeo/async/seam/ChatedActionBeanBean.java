@@ -37,7 +37,8 @@ public class ChatedActionBeanBean implements Serializable {
     protected NuxeoPrincipal currentNuxeoPrincipal;
 
     @Factory(value="chatedEndpoint", scope=ScopeType.APPLICATION)
-    public String getContributors() throws Exception {
+    public String getChatedEndpoint() throws Exception {
         return CHATED_ENDPOINT;
     }
+
 }
