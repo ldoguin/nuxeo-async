@@ -1,5 +1,8 @@
 <div style="float:right">
 
+<div id="connectedUser">
+</div>
+
 <div>
 <div id="send">
   <form onsubmit="return false;">
@@ -26,6 +29,7 @@
   var chanAddress = '/chated/#{currentDocument.id}';
   var userId = '#{currentUser.name}';
   var userToken = 'token';
+  var chatedEndpoint = '#{chatedEndpoint}';
 
   function publish(address, message) {
     if (eb) {
@@ -45,13 +49,14 @@
 
   function closeConn() {
     if (eb) {
+      publish(chanAddress, userId + " left the page");
       eb.close();
     }
   }
 
   function openConn() {
     if (!eb) {
-      eb = new vertx.EventBus("http://localhost:8180/chated");
+      eb = new vertx.EventBus(chatedEndpoint);
 
       eb.onopen = function() {
         jQuery("#status_info").text("Connected");

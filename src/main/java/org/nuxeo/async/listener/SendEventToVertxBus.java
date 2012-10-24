@@ -37,7 +37,7 @@ public class SendEventToVertxBus implements EventListener {
 
     public static final String JSON_MESSAGE = "{\"docid\":\"%s\",\"eventName\":\"%s\",\"eventDate\":\"%s\",\"userId\":\"%s\"}";
 
-    public static final String CHATED_ENDPOINT = Framework.getProperty("chated.endpoint.url");
+    public static final String NX_IN_ENDPOINT = Framework.getProperty("nxin.endpoint.url");
 
     public void handleEvent(Event event) throws ClientException {
         EventContext ec = event.getContext();
@@ -48,7 +48,7 @@ public class SendEventToVertxBus implements EventListener {
                 String message = String.format(JSON_MESSAGE, source.getId(),
                         event.getName(), ""+event.getTime(),
                         dec.getPrincipal().getName());
-                PostMethod post = new PostMethod(CHATED_ENDPOINT);
+                PostMethod post = new PostMethod(NX_IN_ENDPOINT);
                 StringRequestEntity input = new StringRequestEntity(message,
                         "application/json", "utf-8");
                 post.setRequestEntity(input);
