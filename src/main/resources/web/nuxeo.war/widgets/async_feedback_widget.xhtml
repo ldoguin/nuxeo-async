@@ -33,7 +33,7 @@
 <script>
 
   var eb = null;
-  var docId = '#{currentDocument.id}';
+  var chanAddress = '/chated/#{currentDocument.id}';
   var userId = '#{currentUser.name}';
   var userToken = 'token';
 
@@ -47,11 +47,11 @@
   function subscribe(address) {
     if (eb) {
       eb.registerHandler(address, function(msg, replyTo) {
-        jQuery('#received').append(msg.text + '&lt;br&gt;');
+        jQuery('#received').prepend(msg.text + '&lt;br&gt;');
       });
       jQuery('#subscribed').append(jQuery('&lt;code&gt;').text('to ' + address));
       jQuery('#subscribed').append(jQuery('&lt;/code&gt;&lt;br&gt;'));
-      publish(docId, "#{currentUser.name} connected");
+      publish(chanAddress, "#{currentUser.name} connected");
     }
   }
 
@@ -63,11 +63,11 @@
 
   function openConn() {
     if (!eb) {
-      eb = new vertx.EventBus("http://localhost:8081/eventbus");
+      eb = new vertx.EventBus("http://localhost:8180/chated");
 
       eb.onopen = function() {
         jQuery("#status_info").text("Connected");
-        subscribe(docId);
+        subscribe(chanAddress);
       };
 
       eb.onclose = function() {
@@ -85,7 +85,7 @@
     });
 
     jQuery('#sendButton').click(function() {
-      publish(docId, jQuery('#sendMessage').val());
+      publish(chanAddress, jQuery('#sendMessage').val());
     });
   
     openConn();

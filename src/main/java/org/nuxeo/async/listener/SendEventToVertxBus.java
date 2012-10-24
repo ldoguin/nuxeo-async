@@ -17,20 +17,16 @@
 
 package org.nuxeo.async.listener;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.http.HttpClientRequest;
-import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.json.impl.Json;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * Following Listener will forward events to Vertx event bus.
@@ -39,32 +35,29 @@ import org.vertx.java.core.json.impl.Json;
  */
 public class SendEventToVertxBus implements EventListener {
 
-	public void handleEvent(Event event) throws ClientException {
-		EventContext ec = event.getContext();
-		if (ec instanceof DocumentEventContext) {
-			DocumentEventContext dec = (DocumentEventContext) ec;
-			DocumentModel source = dec.getSourceDocument();
-			Buffer buff = new Buffer();
-			JsonObject message = new JsonObject().putString("docId",
-					source.getId()).putString("docTitle", source.getTitle()).putString("type", "publish")
-					.putString("address", "nuxeo.eventbus");
-			JsonObject obj = new JsonObject().putString("type", "publish")
-					.putString("address", "nuxeo.eventbus")
-					.putObject("body", message);	
-			buff.appendString(Json.encode(obj));
-			HttpClient client = Vertx.newVertx().createHttpClient()
-					.setHost("localhost").setPort(8082);
-			HttpClientRequest request = client.post("/nuxeoevent/",
-					new Handler<HttpClientResponse>() {
-						public void handle(HttpClientResponse resp) {
+    public static final String JSON_MESSAGE = "{\"docid\":\"%s\",\"eventName\":\"%s\",\"eventDate\":\"%s\",\"userId\":\"%s\"}";
 
-						}
-					});
-			
-			request.end(buff);
-			client.close();
+    public static final String CHATED_ENDPOINT = Framework.getProperty("chated.endpoint.url");
 
-		}
-	}
-
+    public void handleEvent(Event event) throws ClientException {
+        EventContext ec = event.getContext();
+        if (ec instanceof DocumentEventContext) {
+            DocumentEventContext dec = (DocumentEventContext) ec;
+            DocumentModel source = dec.getSourceDocument();
+            try {
+                String message = String.format(JSON_MESSAGE, source.getId(),
+                        event.getName(), ""+event.getTime(),
+                        dec.getPrincipal().getName());
+                PostMethod post = new PostMethod(CHATED_ENDPOINT);
+                StringRequestEntity input = new StringRequestEntity(message,
+                        "application/json", "utf-8");
+                post.setRequestEntity(input);
+                HttpClient client = new HttpClient();
+                int status = client.executeMethod(post);
+                String response = post.getResponseBodyAsString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
